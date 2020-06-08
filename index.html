@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR" ng-app="app">
+<title>Vote consciente!</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width"/>
+    <link rel="stylesheet" href="css/css.css">
+    <link rel="stylesheet" href="css/material.min.css">
+    <script src="js/material.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script>
+let app = angular.module('app', []);
+app.controller('Parlamentar', function($scope, $http){
+	let cabecalhos 	= 'Accept: application/json';
+	$scope.listaSenador = function () {
+		$http.get('http://legis.senado.gov.br/dadosabertos/senador/lista/atual',cabecalhos).success(function(data) {
+				let itemLista;
+				let arraySenadores = [];
+				for (var indice in data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'] ) {
+				
+				
+			arraySenadores.push( { id: data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['CodigoParlamentar']
+					  , nomeCompleto: data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['NomeParlamentar'] 
+                      , EmailParlamentar: data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['EmailParlamentar']        
+                      , SiglaPartidoParlamentar : data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['SiglaPartidoParlamentar'] 
+					  , UrlFotoParlamentar : data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['UrlFotoParlamentar'] 
+                      , URLParlamentar: data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['IdentificacaoParlamentar']['UrlPaginaParlamentar']
+                      , FimMandato: data['ListaParlamentarEmExercicio']['Parlamentares']['Parlamentar'][indice]['Mandato']['SegundaLegislaturaDoMandato']['DataFim']
+                   }
+                   
+            );
+
+            }
+			$scope.items = arraySenadores;
+		}).error(function(erro) {
+			console.log('Ocorreu um erro: ' + erro);
+		} );
+	}
+});
+</script>
+</head>
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <header class="mdl-layout__header mdl-layout__header--scroll">
+    <div class="mdl-layout__header-row">
+      <span class="mdl-layout__title">Vote consciente! Senadores</span>
+      <div class="mdl-layout-spacer"></div>
+</div>
+	
+</header>
+	<div ng-controller="Parlamentar" ng-init="listaSenador()">  
+		<div class="mdl-grid">
+	      	  <div class="mdl-cell mdl-cell--4-col" ng-repeat="fichaParlamentar in items">
+                <div class="demo-card-square mdl-card mdl-shadow--2dp">
+                    <img src="{{fichaParlamentar.UrlFotoParlamentar}}" width="220" height="240" border="0" alt="">
+                <div class="mdl-card__title mdl-card--expand">
+                    <h2 class="mdl-card__title-text">{{fichaParlamentar.nomeCompleto}}</h2>			
+                </div>
+                <div class="mdl-card__supporting-text">
+                EmailParlamentar {{fichaParlamentar.EmailParlamentar}}
+                </div>
+                <div class="mdl-card__supporting-text">
+                Partido {{fichaParlamentar.SiglaPartidoParlamentar}}
+                </div>
+                <div class="mdl-card__supporting-text">
+                    <a target="_blank" ng-href="{{fichaParlamentar.URLParlamentar}}">Site</a>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    Fim mandato {{fichaParlamentar.FimMandato | date:'dd/MM/yyyy'}}
+                </div>
+            </div>
+            </div>
+          </div>
+       </div>
+</body>
+</html>
